@@ -25,12 +25,21 @@ pip install requests beautifulsoup4
     > python3 servicescan.py --url https://company.service-now.com
     ```
 
+### Fast-Check Option
+You can perform a fast check that only scans for the table `incident` using the `--fast-check` argument:
+
+    ```bash
+    > python3 servicescan.py --url https://company.service-now.com --fast-check
+    ```
+
 ### Example Output
 If the target instance is found to be vulnerable, you'll receive an output similar to the following:
 
 ```bash
-https://company.service-now.com is VULNERABLE, it was found at least 500 items
+https://hackerone.service-now.com/api/now/sp/widget/widget-simple-list?t=sc_cat_item is EXPOSED, found at least 167 items
 ```
+
+> **Note:** A table may be public but not necessarily expose sensitive information. Always verify that the disclosed data is indeed confidential before taking any action.
 
 ## Credits
 
