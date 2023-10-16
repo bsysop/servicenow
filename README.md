@@ -19,22 +19,32 @@ pip install requests
 
 1. Clone the repository to your local machine.
 2. Navigate to the directory containing `servicescan.py`.
-3. Run the script using Python 3 as shown below:
+3. Choose one of the following methods to run the script using Python 3:
 
+### Method 1: Single URL
 ```bash
 python3 servicescan.py --url https://redacted.service-now.com
 ```
 
-### Fast-Check Option
-You can perform a fast check that only scans for the table `kb_knowledge` using the `--fast-check` argument:
+### Method 2: Multiple URLs from a File
+```bash
+python3 servicescan.py --file urls.txt
+```
 
+### Fast-Check Option
+Perform a fast check that only scans for the table `kb_knowledge` using the `--fast-check` argument:
 ```bash
 python3 servicescan.py --url https://redacted.service-now.com --fast-check
 ```
 
+### Using a Proxy
+To use a proxy server, use the `--proxy` option:
+```bash
+python3 servicescan.py --url https://redacted.service-now.com --proxy http://host:port
+```
+
 ### Example Output
 If the target instance is found to be vulnerable, you'll receive an output similar to the following:
-
 ```bash
 https://redacted.service-now.com/api/now/sp/widget/widget-simple-list?t=incident is EXPOSED, found at least 167 items
 https://redacted.service-now.com/api/now/sp/widget/widget-simple-list?t=oauth_entity is EXPOSED, found at least 3 items
