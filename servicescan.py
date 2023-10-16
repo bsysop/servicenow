@@ -28,7 +28,8 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
         "t=sys_email_attachment&f=attachment",
         "t=cmn_notif_device&f=email_address",
         "t=sys_portal_age&f=display_name",
-        "t=incident&f=short_description"
+        "t=incident&f=short_description",
+        "t=sys_user&f=number"
     ]
 
     if fast_check:
