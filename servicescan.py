@@ -9,22 +9,24 @@ import re
 
 def check_vulnerability(url, g_ck_value, cookies):
     table_list = [
-        "cmdb_model",
-        "cmn_department",
-        "licensable_app",
-        "alm_asset",
-        "kb_knowledge",
-        "sys_attachment",
-        "sc_cat_item",
-        "sys_attachment_doc",
-        "oauth_entity",
-        "cmn_cost_center",
-        "sn_admin_center_application",
-        "cmn_company",
-        "sys_email_attachment",
-        "cmn_notif_device",
-        "sys_portal_age",
-        "incident"
+        "t=cmdb_model&f=name",
+        "t=cmn_department&f=app_name",
+        "t=kb_knowledge&f=text",
+        "t=licensable_app&f=app_name",
+        "t=alm_asset&f=display_name",
+        "t=sys_attachment&f=file_name",
+        "t=sys_attachment_doc&f=data",
+        "t=oauth_entity&f=name",
+        "t=cmn_cost_center&f=name",
+        "t=cmdb_model&f=name",
+        "t=sc_cat_item&f=name",
+        "t=sn_admin_center_application&f-name",
+        "t=cmn_company&f=name",
+        "t=sys_email_attachment&f=email",
+        "t=sys_email_attachment&f=attachment",
+        "t=cmn_notif_device&f=email_address",
+        "t=sys_portal_age&f=display_name",
+        "t=incident&f=short_description"
     ]
 
     if fast_check:
@@ -41,7 +43,7 @@ def check_vulnerability(url, g_ck_value, cookies):
             'Connection': 'close'
         }
 
-        post_url = f"{url}/api/now/sp/widget/widget-simple-list?t={table}"
+        post_url = f"{url}/api/now/sp/widget/widget-simple-list?{table}"
         data_payload = json.dumps({})  # Empty JSON payload
 
         post_response = s.post(post_url, headers=headers, data=data_payload, verify=False)
