@@ -21,16 +21,16 @@ pip install requests beautifulsoup4
 2. Navigate to the directory containing `servicescan.py`.
 3. Run the script using Python 3 as shown below:
 
-    ```bash
-    python3 servicescan.py --url https://redacted.service-now.com
-    ```
+```bash
+python3 servicescan.py --url https://redacted.service-now.com
+```
 
 ### Fast-Check Option
 You can perform a fast check that only scans for the table `incident` using the `--fast-check` argument:
 
-    ```bash
-    python3 servicescan.py --url https://redacted.service-now.com --fast-check
-    ```
+```bash
+python3 servicescan.py --url https://redacted.service-now.com --fast-check
+```
 
 ### Example Output
 If the target instance is found to be vulnerable, you'll receive an output similar to the following:
