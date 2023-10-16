@@ -22,14 +22,14 @@ pip install requests beautifulsoup4
 3. Run the script using Python 3 as shown below:
 
     ```bash
-    > python3 servicescan.py --url https://redacted.service-now.com
+    python3 servicescan.py --url https://redacted.service-now.com
     ```
 
 ### Fast-Check Option
 You can perform a fast check that only scans for the table `incident` using the `--fast-check` argument:
 
     ```bash
-    > python3 servicescan.py --url https://redacted.service-now.com --fast-check
+    python3 servicescan.py --url https://redacted.service-now.com --fast-check
     ```
 
 ### Example Output
