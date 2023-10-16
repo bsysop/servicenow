@@ -8,11 +8,11 @@ For an in-depth understanding of the attack technique and exploitation, consult 
 
 ## Pre-requisites
 - Python 3.x
-- Required Python libraries: `requests`, `BeautifulSoup`
+- Required Python libraries: `requests`
 
 You can install the required libraries using pip:
 ```bash
-pip install requests beautifulsoup4
+pip install requests
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ python3 servicescan.py --url https://redacted.service-now.com
 ```
 
 ### Fast-Check Option
-You can perform a fast check that only scans for the table `incident` using the `--fast-check` argument:
+You can perform a fast check that only scans for the table `kb_knowledge` using the `--fast-check` argument:
 
 ```bash
 python3 servicescan.py --url https://redacted.service-now.com --fast-check
@@ -42,9 +42,11 @@ https://redacted.service-now.com/api/now/sp/widget/widget-simple-list?t=oauth_en
 
 > **Note:** A table may be public but not necessarily expose sensitive information. Always verify that the disclosed data is indeed confidential before taking any action.
 
-## Credits
+## Credits and Contributors
 
 - [Aaron Costello](https://twitter.com/ConspiracyProof) - Researcher who provided the technical details and exploitation method. [Website](https://www.enumerated.ie/)
+- [bsysop](https://twitter.com/bsysop) - Tool Creator
+- [Aaron Ringo](https://twitter.com/AlphaRingo) - Major PR with several improvements
 
 ## Disclaimer
 This tool is intended for educational and ethical testing purposes only. The authors are not responsible for any misuse or damage caused by this tool.
