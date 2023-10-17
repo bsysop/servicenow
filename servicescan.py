@@ -77,8 +77,7 @@ def check_url_get_headers(url, proxies):
             return g_ck_value,cookies,s
 
     if not g_ck_value:
-        print(f"{url} - Error: g_ck not found.")
-        exit(1)
+        return None, None, None
 
 
 def main(url, fast_check, proxy):
@@ -89,7 +88,11 @@ def main(url, fast_check, proxy):
 
     url = url.strip()
     url = url.rstrip('/') 
-    g_ck_value,cookies,s = check_url_get_headers(url, proxies)
+    g_ck_value, cookies, s = check_url_get_headers(url, proxies)
+    if g_ck_value is None:
+        print(f"Skipping {url} due to missing g_ck.")
+        return
+
     vulnerable_url = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
     if vulnerable_url:
         print("Headers to forge requests:")
