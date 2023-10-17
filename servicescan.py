@@ -89,32 +89,42 @@ def main(url,fast_check,proxy):
 
     url = url.strip()
     url = url.rstrip('/') 
-    g_ck_value,cookies,s = check_url_get_headers(url,proxies)
-    vulnerable_urls = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
-    if not vulnerable_urls:
-        print(f"Not affected")
+    g_ck_value,cookies,s = check_url_get_headers(url, proxies)
+    vulnerable_url = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
+    if vulnerable_url:
+        print("Headers to forge requests:")
+        print(f"X-UserToken: {g_ck_value}")
+        print(f"Cookie: {'; '.join([f'{k}={v}' for k, v in cookies.items()])}\n")
+    
+    return bool(vulnerable_url)
 
 
 if __name__=='__main__':
+    any_vulnerable = False # Track if any URLs are vulnerable
+
     parser = argparse.ArgumentParser(description='Fetch g_ck and cookies from a given URL')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--url', help='The URL to fetch from')
     group.add_argument('--file', help='File of URLs')
     parser.add_argument('--fast-check', action='store_true', help='Only check for the table incident')
-    parser.add_argument('--proxy', help='Proxy server in the format http://host:port',default=None)
+    parser.add_argument('--proxy', help='Proxy server in the format http://host:port', default=None)
     args = parser.parse_args()
     fast_check = args.fast_check
     proxy = args.proxy
     if args.url:
-        main(args.url,fast_check,proxy)    
+        any_vulnerable = main(args.url, fast_check, proxy)    
     else:
         try:
             url_file=args.file
             with open(url_file, 'r') as file:
                 url_list = file.readlines()
             for url in url_list:
-                main(url,fast_check,proxy)
+                if main(url, fast_check, proxy):
+                    any_vulnerable = True # At least one URL was vulnerable
         except FileNotFoundError:
             print(f"Could not find {url_file}")
         except Exception as e:
             print(f"Error occurred: {e}")
+
+    if not any_vulnerable:
+        print("Scanning completed. No vulnerable URLs found.")

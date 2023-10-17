@@ -48,6 +48,9 @@ If the target instance is found to be vulnerable, you'll receive an output simil
 ```bash
 https://redacted.service-now.com/api/now/sp/widget/widget-simple-list?t=incident is EXPOSED, found at least 167 items
 https://redacted.service-now.com/api/now/sp/widget/widget-simple-list?t=oauth_entity is EXPOSED, found at least 3 items
+Headers to forge requests:
+X-UserToken: 76a458ffdbf5[REDACTED]0c02ba13393b764
+Cookie: JSESSIONID=7EB7[REDACTED]B5D07E; glide_user_route=glide.4884750d[REDACTED]ca0436e4; glide_node_id_for_js=3143935013eaa5a1e[REDACTED]8a698b419c40837dfce63002d5;
 ```
 
 > **Note:** A table may be public but not necessarily expose sensitive information. Always verify that the disclosed data is indeed confidential before taking any action.
