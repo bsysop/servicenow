@@ -81,7 +81,7 @@ def check_url_get_headers(url, proxies):
         exit(1)
 
 
-def main(url,fast_check,proxy):
+def main(url, fast_check, proxy):
     if proxy:
         proxies = {'http': proxy, 'https': proxy}
     else:
