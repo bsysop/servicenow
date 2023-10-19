@@ -5,8 +5,8 @@ import argparse
 import requests
 import json
 import re
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
 def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
@@ -24,12 +24,20 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
         "t=sc_cat_item&f=name",
         "t=sn_admin_center_application&f-name",
         "t=cmn_company&f=name",
+        "t=customer_account&f=name",
         "t=sys_email_attachment&f=email",
         "t=sys_email_attachment&f=attachment",
         "t=cmn_notif_device&f=email_address",
         "t=sys_portal_age&f=display_name",
         "t=incident&f=short_description",
-        "t=sys_user&f=number"
+        "t=work_order&f=number",
+        "t=incident&f=number",
+        "t=sn_customerservice_case&f=number",
+        "t=task&f=number",
+        "t=customer_project&f=number",
+        "t=customer_project_task&f=number",
+        "t=sys_user&f=name",
+        "t=customer_contact&f=name"
     ]
 
     if fast_check:
@@ -56,15 +64,18 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
             if 'result' in response_json and response_json['result']:
                 if 'data' in response_json['result']:
                     if 'count' in response_json['result']['data'] and response_json['result']['data']['count'] > 0:
-                        print(f"{post_url} is EXPOSED, found at least {response_json['result']['data']['count']} items")
+                        if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
+                            print(f"{post_url} is EXPOSED, and LEAKING data. Check ACLs ASAP.")
+                        else:
+                            print(
+                                f"{post_url} is EXPOSED, but data is NOT leaking likley because ACLs are blocking. Mark Widgets as not Public.")
                         vulnerable_urls.append(post_url)
-    
+
     return vulnerable_urls
 
 
-
 def check_url_get_headers(url, proxies):
-    # get the session 
+    # get the session
     s = requests.Session()
     response = s.get(url, verify=False, proxies=proxies)
     cookies = s.cookies.get_dict()
@@ -74,7 +85,7 @@ def check_url_get_headers(url, proxies):
         match = re.search(r"var g_ck = '([a-zA-Z0-9]+)'", response.text)
         if match:
             g_ck_value = match.group(1)
-            return g_ck_value,cookies,s
+            return g_ck_value, cookies, s
 
     if not g_ck_value:
         return None, None, None
@@ -87,7 +98,7 @@ def main(url, fast_check, proxy):
         proxies = None
 
     url = url.strip()
-    url = url.rstrip('/') 
+    url = url.rstrip('/')
     g_ck_value, cookies, s = check_url_get_headers(url, proxies)
     if g_ck_value is None:
         print(f"Skipping {url} due to missing g_ck.")
@@ -98,12 +109,12 @@ def main(url, fast_check, proxy):
         print("Headers to forge requests:")
         print(f"X-UserToken: {g_ck_value}")
         print(f"Cookie: {'; '.join([f'{k}={v}' for k, v in cookies.items()])}\n")
-    
+
     return bool(vulnerable_url)
 
 
-if __name__=='__main__':
-    any_vulnerable = False # Track if any URLs are vulnerable
+if __name__ == '__main__':
+    any_vulnerable = False  # Track if any URLs are vulnerable
 
     parser = argparse.ArgumentParser(description='Fetch g_ck and cookies from a given URL')
     group = parser.add_mutually_exclusive_group(required=True)
@@ -115,15 +126,15 @@ if __name__=='__main__':
     fast_check = args.fast_check
     proxy = args.proxy
     if args.url:
-        any_vulnerable = main(args.url, fast_check, proxy)    
+        any_vulnerable = main(args.url, fast_check, proxy)
     else:
         try:
-            url_file=args.file
+            url_file = args.file
             with open(url_file, 'r') as file:
                 url_list = file.readlines()
             for url in url_list:
                 if main(url, fast_check, proxy):
-                    any_vulnerable = True # At least one URL was vulnerable
+                    any_vulnerable = True  # At least one URL was vulnerable
         except FileNotFoundError:
             print(f"Could not find {url_file}")
         except Exception as e:
