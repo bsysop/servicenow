@@ -67,7 +67,7 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
                         if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
                             print(f"{post_url} is EXPOSED, and LEAKING data. Check ACLs ASAP.")
                         else:
-                            print(f"{post_url} is EXPOSED, but data is NOT leaking likelys because ACLs are blocking. Mark Widgets as not Public.")
+                            print(f"{post_url} is EXPOSED, but data is NOT leaking likely because ACLs are blocking. Mark Widgets as not Public.")
                         vulnerable_urls.append(post_url)
 
     return vulnerable_urls
