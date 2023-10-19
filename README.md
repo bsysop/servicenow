@@ -59,7 +59,8 @@ Cookie: JSESSIONID=7EB7[REDACTED]B5D07E; glide_user_route=glide.4884750d[REDACTE
 
 - [Aaron Costello](https://twitter.com/ConspiracyProof) - Researcher who provided the technical details and exploitation method. [Website](https://www.enumerated.ie/)
 - [bsysop](https://twitter.com/bsysop) - Tool Creator
-- [Aaron Ringo](https://twitter.com/AlphaRingo) - Major PR with several improvements
+- [Aaron Ringo](https://twitter.com/AlphaRingo) - Code Refactor and implementation of --proxy and --file implementations
+- [Nathan Sanders](https://github.com/pysanders) - Filtering improvement to detect accurate leaking data
 
 ## Disclaimer
 This tool is intended for educational and ethical testing purposes only. The authors are not responsible for any misuse or damage caused by this tool.
