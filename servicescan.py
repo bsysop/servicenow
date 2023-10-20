@@ -9,7 +9,7 @@ import re
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
-def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
+def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, display):
     table_list = [
         "t=cmdb_model&f=name",
         "t=cmn_department&f=app_name",
@@ -68,6 +68,19 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check):
                     if 'count' in response_json['result']['data'] and response_json['result']['data']['count'] > 0:
                         if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
                             print(f"{post_url} is EXPOSED, and LEAKING data. Check ACLs ASAP.")
+                            if display:
+                                try:
+                                    items = response_json['result']['data']['list']
+                                    for item in items:
+                                        display_value = item['display_field']['display_value']
+                                        sys_id = item['sys_id']                                        
+                                        if "sys_attachment" in table:
+                                            print(f'{url}/sys_attachment.do?sys_id={sys_id}#{display_value}')
+                                        else:
+                                            print(f'{display_value}')
+                                    print("")
+                                except:
+                                    print('failed to extract display data')
                         else:
                             print(f"{post_url} is EXPOSED, but data is NOT leaking likely because ACLs are blocking. Mark Widgets as not Public.")
                         vulnerable_urls.append(post_url)
@@ -92,7 +105,7 @@ def check_url_get_headers(url, proxies):
         return None, cookies, s
 
 
-def main(url, fast_check, proxy):
+def main(url, fast_check, proxy, display, headers):
     if proxy:
         proxies = {'http': proxy, 'https': proxy}
     else:
@@ -104,8 +117,8 @@ def main(url, fast_check, proxy):
     if g_ck_value is None:
         print(f"{url} has no g_ck. Continuing test without X-UserToken header")
 
-    vulnerable_url = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check)
-    if vulnerable_url:
+    vulnerable_url = check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, display)
+    if vulnerable_url and headers :
         print("Headers to forge requests:")
         if g_ck_value is not None:
             print(f"X-UserToken: {g_ck_value}")
@@ -123,18 +136,22 @@ if __name__ == '__main__':
     group.add_argument('--file', help='File of URLs')
     parser.add_argument('--fast-check', action='store_true', help='Only check for the table incident')
     parser.add_argument('--proxy', help='Proxy server in the format http://host:port', default=None)
+    parser.add_argument('--display', action='store_true', help='output display name for quick visual')
+    parser.add_argument('--headers', action='store_true', help='print headers to forge request with any vulnerable systems')
     args = parser.parse_args()
     fast_check = args.fast_check
+    display = args.display
     proxy = args.proxy
+    headers = args.headers
     if args.url:
-        any_vulnerable = main(args.url, fast_check, proxy)
+        any_vulnerable = main(args.url, fast_check, proxy, display, headers)
     else:
         try:
             url_file = args.file
             with open(url_file, 'r') as file:
                 url_list = file.readlines()
             for url in url_list:
-                if main(url, fast_check, proxy):
+                if main(url, fast_check, proxy, display, headers):
                     any_vulnerable = True  # At least one URL was vulnerable
         except FileNotFoundError:
             print(f"Could not find {url_file}")
