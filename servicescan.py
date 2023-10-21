@@ -22,7 +22,7 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, displa
         "t=cmn_cost_center&f=name",
         "t=cmdb_model&f=name",
         "t=sc_cat_item&f=name",
-        "t=sn_admin_center_application&f-name",
+        "t=sn_admin_center_application&f=name",
         "t=cmn_company&f=name",
         "t=customer_account&f=name",
         "t=sys_email_attachment&f=email",
@@ -37,7 +37,20 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, displa
         "t=customer_project&f=number",
         "t=customer_project_task&f=number",
         "t=sys_user&f=name",
-        "t=customer_contact&f=name"
+        "t=customer_contact&f=name",
+        "t=incident&f=comments_and_work_notes",
+        "t=sys_user&f=number",
+        "t=cmdb_ci_app_server_tomcat&f=name",
+        "t=cmdb_ci_app_server_tomcat&f=install_directory",
+        "t=svc_container&f=name",
+        "t=cmdb_ci_app_server_jboss&f=name",
+        "t=cmdb_ci_app_server_jboss&f=install_directory",
+        "t=cmdb_ci_app_server_tomcat_war&f=name",
+        "t=cmdb_ci_app_server_tomcat_war&f=install_directory",
+        "t=cmdb_ci_app_server_websphere&f=name",
+        "t=cmdb_ci_app_server_websphere&f=install_directory",
+        "t=task&f=short_description",
+        "t=task&f=comments_and_work_notes"
     ]
 
     if fast_check:
