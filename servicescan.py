@@ -66,14 +66,16 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, displa
             if 'result' in response_json and response_json['result']:
                 if 'data' in response_json['result']:
                     if 'count' in response_json['result']['data'] and response_json['result']['data']['count'] > 0:
-                        if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
+                        if response_json['result']['data']['list'] and \
+                                len(response_json['result']['data']['list']) > 0 and \
+                                re.search('"display_value":".*"', post_response.text):
                             print(f"{post_url} is EXPOSED, and LEAKING data. Check ACLs ASAP.")
                             if display:
                                 try:
                                     items = response_json['result']['data']['list']
                                     for item in items:
                                         display_value = item['display_field']['display_value']
-                                        sys_id = item['sys_id']                                        
+                                        sys_id = item['sys_id']
                                         if "sys_attachment" in table:
                                             print(f'{url}/sys_attachment.do?sys_id={sys_id}#{display_value}')
                                         else:
