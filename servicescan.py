@@ -67,20 +67,25 @@ def check_vulnerability(url, g_ck_value, cookies, s, proxies, fast_check, displa
                 if 'data' in response_json['result']:
                     if 'count' in response_json['result']['data'] and response_json['result']['data']['count'] > 0:
                         if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
-                            print(f"{post_url} is EXPOSED, and LEAKING data. Check ACLs ASAP.")
-                            if display:
-                                try:
-                                    items = response_json['result']['data']['list']
-                                    for item in items:
-                                        display_value = item['display_field']['display_value']
-                                        sys_id = item['sys_id']                                        
-                                        if "sys_attachment" in table:
-                                            print(f'{url}/sys_attachment.do?sys_id={sys_id}#{display_value}')
-                                        else:
-                                            print(f'{display_value}')
-                                    print("")
-                                except:
-                                    print('failed to extract display data')
+                            if response_json['result']['data']['list'] and len(response_json['result']['data']['list']) > 0:
+                                if any(d['display_field']['display_value'] is not None for d in response_json['result']['data']['list']):
+                                    print(f"{post_url} is EXPOSED, and REALLY LEAKING data. Check ACLs ASAP.")
+                                else:
+                                    print(f"{post_url} is EXPOSED, and POTENTIALLY LEAKING data. Check ACLs ASAP.")
+                                
+                                if display:
+                                    try:
+                                        items = response_json['result']['data']['list']
+                                        for item in items:
+                                            display_value = item['display_field']['display_value']
+                                            sys_id = item['sys_id']                                        
+                                            if "sys_attachment" in table:
+                                                print(f'{url}/sys_attachment.do?sys_id={sys_id}#{display_value}')
+                                            else:
+                                                print(f'{display_value}')
+                                        print("")
+                                    except:
+                                        print('failed to extract display data')
                         else:
                             print(f"{post_url} is EXPOSED, but data is NOT leaking likely because ACLs are blocking. Mark Widgets as not Public.")
                         vulnerable_urls.append(post_url)
