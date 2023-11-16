@@ -37,11 +37,24 @@ Perform a fast check that only scans for the table `kb_knowledge` using the `--f
 python3 servicescan.py --url https://redacted.service-now.com --fast-check
 ```
 
+### Extended tests
+To perform more tests than what is provided by default, you can specify a `--table-file TABLE_FILE` argument to query particular tables a fields. A sample file is provided in `sample_table_query.txt`:
+```bash
+python3 servicescan.py --url https://redacted.service-now.com --table-file sample_table_query.txt
+```
+
 ### Using a Proxy
 To use a proxy server, use the `--proxy` option:
 ```bash
 python3 servicescan.py --url https://redacted.service-now.com --proxy http://host:port
 ```
+
+### Credentials
+By default, the script will perform a scan without logging-in. If interested in performing a scan using a particular user
+```bash
+python3 servicescan.py --url https://redacted.service-now.com --user test.snc.internal
+```
+You will be prompted to specify a password if not provided via the `--password` argument.
 
 ### Example Output
 If the target instance is found to be vulnerable, you'll receive an output similar to the following:
