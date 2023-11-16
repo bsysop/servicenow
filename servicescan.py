@@ -155,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('--proxy', help='Proxy server in the format http://host:port', default=None)
     parser.add_argument('--display', action='store_true', help='output display name for quick visual')
     parser.add_argument('--headers', action='store_true', help='print headers to forge request with any vulnerable systems')
-    parser.add_argument('--table-file', help='The specific tables to test')
+    parser.add_argument('--table-file', help='The specific tables to test. Sample sample_table_query.txt')
     parser.add_argument('--username', help='The username to login with')
     parser.add_argument('--password', help='The password to login with')
     args = parser.parse_args()
